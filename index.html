@@ -1,85 +1,36 @@
-```html
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Coin Loot</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 
-/* ===== GLOBAL DESIGN ===== */
-
+/* PAGE STYLE */
 body{
-margin:0;
-font-family:Arial;
-background:linear-gradient(135deg,#141e30,#243b55);
+font-family: Arial;
+background:#111;
 color:white;
 text-align:center;
+padding:30px;
 }
 
-/* ===== PAGE SYSTEM ===== */
-
-.page{
-display:none;
-padding-top:80px;
-}
-
-.active{
-display:block;
-}
-
-/* ===== INPUT BOX ===== */
-
-input{
-width:85%;
-padding:10px;
-margin:10px;
-border-radius:10px;
-border:none;
-}
-
-/* ===== BUTTON ===== */
-
+/* LOGIN BUTTON */
 button{
-padding:10px 20px;
+background:#ff9800;
 border:none;
-border-radius:25px;
-background:gold;
-cursor:pointer;
-}
-
-/* ===== CARD ===== */
-
-.card{
-background:rgba(255,255,255,0.1);
-margin:15px;
 padding:15px;
-border-radius:12px;
-}
-
-/* ===== NAVIGATION ===== */
-
-.nav{
-position:fixed;
-bottom:0;
-width:100%;
-background:#111;
-display:flex;
-justify-content:space-around;
-padding:10px;
-}
-
-.nav button{
-background:none;
+font-size:18px;
+border-radius:8px;
 color:white;
+cursor:pointer;
+margin:10px;
 }
 
-/* ===== COINS TEXT ===== */
-
-.balance{
-font-size:40px;
-margin:20px;
+/* COINS BOX */
+#coinsBox{
+font-size:25px;
+margin-top:20px;
 }
 
 </style>
@@ -87,264 +38,129 @@ margin:20px;
 
 <body>
 
-<!-- ===== RUNNING TEXT ===== -->
+<h1>Coin Loot</h1>
 
-<marquee style="background:black;color:gold;padding:10px;">
-Coins never reset. Convert coins to real money on the 30th of this month.
-20 Coins = ₹0.50. Collect coins every 4 hours.
-</marquee>
+<!-- LOGIN BUTTON -->
+<button onclick="googleLogin()">Login With Google</button>
 
-<!-- ===== LOGIN PAGE ===== -->
+<!-- USER INFO -->
+<h3 id="username"></h3>
 
-<div id="login" class="page active">
-
-<h2>Coin Loot Login</h2>
-
-<input id="name" placeholder="Enter Name">
-
-<input id="phone" placeholder="Enter Phone Number">
-
-<br>
-
-<button onclick="loginUser()">Login / Signup</button>
-
+<!-- COINS -->
+<div id="coinsBox">
+Coins: <span id="coins">0</span>
 </div>
 
-<!-- ===== HOME PAGE ===== -->
+<!-- WATCH AD -->
+<button onclick="watchAd()">Watch Ad +100 Coins</button>
 
-<div id="home" class="page">
+<script type="module">
 
-<h2>Coin Loot</h2>
+/* FIREBASE IMPORT */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-<div class="balance">
-Coins : <span id="coins">0</span>
-</div>
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-<div>
-Value ₹ <span id="value">0</span>
-</div>
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-<br>
 
-<button onclick="collectCoins()">Collect Coins</button>
-
-</div>
-
-<!-- ===== WALLET PAGE ===== -->
-
-<div id="wallet" class="page">
-
-<h2>Wallet</h2>
-
-<div class="card">
-Coins Balance : <span id="walletCoins">0</span>
-</div>
-
-<div class="card">
-Value ₹ : <span id="walletValue">0</span>
-</div>
-
-<div class="card">
-20 Coins = ₹0.50  
-Coins convert to money on 30th.
-</div>
-
-</div>
-
-<!-- ===== PROFILE PAGE ===== -->
-
-<div id="profile" class="page">
-
-<h2>Profile</h2>
-
-<div class="card">
-Name : <span id="pname"></span>
-</div>
-
-<div class="card">
-Phone : <span id="pphone"></span>
-</div>
-
-<button onclick="logout()">Logout</button>
-
-</div>
-
-<!-- ===== NAVIGATION BAR ===== -->
-
-<div class="nav">
-
-<button onclick="showPage('home')">Home</button>
-
-<button onclick="showPage('wallet')">Wallet</button>
-
-<button onclick="showPage('profile')">Profile</button>
-
-</div>
-
-<!-- ===== FIREBASE LIBRARIES ===== -->
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
-<script>
-
-/* ===== FIREBASE CONFIG ===== */
+/* FIREBASE CONFIG */
 
 const firebaseConfig = {
-
 apiKey: "AIzaSyBhMUIld4qnt42X0BWF_kYZr2R2olDghts",
-
 authDomain: "coinloot-f15f3.firebaseapp.com",
-
 databaseURL: "https://coinloot-f15f3-default-rtdb.firebaseio.com",
-
 projectId: "coinloot-f15f3",
-
 storageBucket: "coinloot-f15f3.firebasestorage.app",
-
 messagingSenderId: "939943880173",
-
 appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4",
-
 measurementId: "G-XMZG9Q2128"
-
 };
 
-/* ===== INITIALIZE FIREBASE ===== */
 
-firebase.initializeApp(firebaseConfig);
+/* INITIALIZE FIREBASE */
 
-const db = firebase.database();
+const app = initializeApp(firebaseConfig);
 
-/* ===== GLOBAL VARIABLES ===== */
+const auth = getAuth(app);
 
-let currentUser = null
+const db = getDatabase(app);
 
-const COIN_VALUE = 0.025
-const COLLECT_REWARD = 20
-const FOUR_HOURS = 4 * 60 * 60 * 1000
 
-/* ===== REWARD AD LINK ===== */
+/* GOOGLE LOGIN */
 
-const AD_LINK = "https://your-reward-ad-link.com"
+window.googleLogin = function(){
 
-/* ===== PAGE NAVIGATION ===== */
+const provider = new GoogleAuthProvider();
 
-function showPage(page){
+signInWithPopup(auth,provider)
 
-document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"))
+.then(async(result)=>{
 
-document.getElementById(page).classList.add("active")
+const user = result.user;
 
-}
+document.getElementById("username").innerText = user.displayName;
 
-/* ===== LOGIN FUNCTION ===== */
+const userRef = ref(db,"users/"+user.uid);
 
-function loginUser(){
+const snap = await get(userRef);
 
-const name = document.getElementById("name").value
-const phone = document.getElementById("phone").value
+if(!snap.exists()){
 
-if(!name || !phone){
-alert("Enter name and phone")
-return
-}
+set(userRef,{
+name:user.displayName,
+email:user.email,
+coins:0
+});
 
-const ref = db.ref("users/"+phone)
-
-ref.get().then(snap=>{
-
-if(snap.exists()){
-
-currentUser = snap.val()
+document.getElementById("coins").innerText = 0;
 
 }else{
 
-currentUser = {
-name:name,
-phone:phone,
-coins:0,
-lastCollect:0
-}
-
-ref.set(currentUser)
+document.getElementById("coins").innerText = snap.val().coins;
 
 }
 
-updateUI()
-showPage("home")
+window.currentUser = user;
 
 })
 
-}
+.catch((error)=>{
 
-/* ===== UPDATE UI ===== */
+alert(error.message);
 
-function updateUI(){
-
-document.getElementById("coins").innerText=currentUser.coins
-document.getElementById("walletCoins").innerText=currentUser.coins
-
-let value=(currentUser.coins*COIN_VALUE).toFixed(2)
-
-document.getElementById("value").innerText=value
-document.getElementById("walletValue").innerText=value
-
-document.getElementById("pname").innerText=currentUser.name
-document.getElementById("pphone").innerText=currentUser.phone
+});
 
 }
 
-/* ===== COLLECT COINS ===== */
 
-function collectCoins(){
+/* WATCH AD FUNCTION */
 
-let now = Date.now()
+window.watchAd = async function(){
 
-if(now-currentUser.lastCollect < FOUR_HOURS){
+if(!window.currentUser){
 
-let remain = FOUR_HOURS-(now-currentUser.lastCollect)
+alert("Login First");
 
-let minutes = Math.floor(remain/60000)
-
-alert("Come back after "+minutes+" minutes")
-
-return
-}
-
-/* ===== OPEN AD ===== */
-
-window.open(AD_LINK,"_blank")
-
-/* ===== WAIT FOR AD ===== */
-
-setTimeout(()=>{
-
-currentUser.coins += COLLECT_REWARD
-currentUser.lastCollect = now
-
-db.ref("users/"+currentUser.phone).update({
-
-coins:currentUser.coins,
-lastCollect:now
-
-})
-
-updateUI()
-
-alert("20 coins added!")
-
-},15000)
+return;
 
 }
 
-/* ===== LOGOUT ===== */
+let coins = parseInt(document.getElementById("coins").innerText);
 
-function logout(){
+coins += 100;
 
-currentUser=null
+document.getElementById("coins").innerText = coins;
 
-showPage("login")
+const userRef = ref(db,"users/"+window.currentUser.uid);
+
+set(userRef,{
+name:window.currentUser.displayName,
+email:window.currentUser.email,
+coins:coins
+});
+
+alert("100 Coins Added");
 
 }
 
@@ -352,4 +168,3 @@ showPage("login")
 
 </body>
 </html>
-```
