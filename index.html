@@ -11,7 +11,7 @@
 body{margin:0;font-family:Arial;background:linear-gradient(135deg,#141e30,#243b55);color:white;overflow:hidden;}
 .page{display:none;height:100vh;padding-top:80px;text-align:center;}
 .active{display:block;}
-input{width:90%;padding:10px;margin:10px;border-radius:10px;border:none;}
+input{width:90%;padding:10px;margin:10px;border-radius:10px;border:none;autocomplete:off;}
 button{padding:10px 20px;border:none;border-radius:25px;background:gold;color:black;cursor:pointer;}
 .card{background:rgba(255,255,255,0.1);padding:15px;margin:15px;border-radius:12px;}
 .balance{font-size:40px;margin:20px;}
@@ -23,18 +23,14 @@ button{padding:10px 20px;border:none;border-radius:25px;background:gold;color:bl
 </head>
 <body>
 
-<!-- =======================
-    FLOATING COINS ANIMATION
-======================= -->
+<!-- FLOATING COINS -->
 <div class="coin" style="left:10%">🪙</div>
 <div class="coin" style="left:30%;animation-delay:1s">🪙</div>
 <div class="coin" style="left:50%;animation-delay:2s">🪙</div>
 <div class="coin" style="left:70%;animation-delay:3s">🪙</div>
 <div class="coin" style="left:90%;animation-delay:4s">🪙</div>
 
-<!-- =======================
-    LOGIN / SIGNUP PAGE
-======================= -->
+<!-- LOGIN / SIGNUP -->
 <div id="login" class="page active">
 <div class="card">
 <h2>Coin Loot</h2>
@@ -46,18 +42,14 @@ button{padding:10px 20px;border:none;border-radius:25px;background:gold;color:bl
 </div>
 </div>
 
-<!-- =======================
-    HOME PAGE
-======================= -->
+<!-- HOME PAGE -->
 <div id="home" class="page">
 <h2>Coin Loot</h2>
 <div class="balance">Ʉ <span id="coins">0</span> (~₹<span id="coinsRs">0</span>)</div>
 <button class="collect" onclick="collectCoins()">Collect Daily Coins</button>
 </div>
 
-<!-- =======================
-    WALLET / BANK PAGE
-======================= -->
+<!-- WALLET / BANK PAGE -->
 <div id="wallet" class="page">
 <h2>Wallet</h2>
 <div class="card">Balance : Ʉ <span id="walletCoins">0</span> (~₹<span id="walletRs">0</span>)</div>
@@ -74,9 +66,7 @@ button{padding:10px 20px;border:none;border-radius:25px;background:gold;color:bl
 </div>
 </div>
 
-<!-- =======================
-    PROFILE PAGE
-======================= -->
+<!-- PROFILE PAGE -->
 <div id="profile" class="page">
 <h2>Profile</h2>
 <div class="card">Email : <span id="userEmail"></span></div>
@@ -88,174 +78,162 @@ Your Code: <b id="refCode"></b>
 <div class="card"><button onclick="logout()">Logout</button></div>
 </div>
 
-<!-- =======================
-    NAVIGATION
-======================= -->
+<!-- NAVIGATION -->
 <div class="nav">
 <button onclick="showPage('home')">Home</button>
 <button onclick="showPage('wallet')">Wallet</button>
 <button onclick="showPage('profile')">Profile</button>
 </div>
 
-<script type="module">
-// =======================
-// FIREBASE SETUP
-// =======================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-app.js";
-import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-database.js";
+<!-- FIREBASE CDN -->
+<script src="https://www.gstatic.com/firebasejs/10.3.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.3.0/firebase-database.js"></script>
 
-// Firebase Config (replace with your own)
+<script>
+/* =======================
+   FIREBASE SETUP
+======================= */
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "XXX",
-    appId: "XXX"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "XXX",
+  appId: "XXX"
 };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// =======================
-// GLOBAL VARIABLES
-// =======================
+/* =======================
+   GLOBAL VARIABLES
+======================= */
 const AD_LINK = "https://YOUR_MONETAG_LINK";
-const REF_BONUS = 200; // coins per referral
+const REF_BONUS = 200;
 const MIN_WITHDRAW = 1000; // coins = 500 Rs
-const COIN_TO_RS = 0.5; // 1 coin = 0.5 Rs
+const COIN_TO_RS = 0.5;
 
 let currentUserData = null;
 
-// =======================
-// PAGE NAVIGATION FUNCTION
-// =======================
+/* =======================
+   PAGE NAVIGATION
+======================= */
 function showPage(page){
-    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-    document.getElementById(page).classList.add("active");
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(page).classList.add("active");
 }
 
-// =======================
-// SIGNUP / LOGIN FUNCTION
-// =======================
-async function signup(){
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const refInput = document.getElementById("refInput").value.trim().toUpperCase();
+/* =======================
+   SIGNUP / LOGIN FUNCTION
+======================= */
+function signup(){
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const refInput = document.getElementById("refInput").value.trim().toUpperCase();
 
-    if(!email || !phone){ alert("Fill all fields"); return; }
+  if(!email || !phone){ alert("Fill all fields"); return; }
 
-    const userRef = ref(db, 'users/' + phone);
-    const snapshot = await get(userRef);
-
+  const userRef = db.ref('users/'+phone);
+  userRef.get().then(snapshot=>{
     if(snapshot.exists()){
-        alert("Account already exists");
-        currentUserData = snapshot.val();
-        updateDashboard();
-        showPage("home");
-        return;
+      alert("Account already exists");
+      currentUserData = snapshot.val();
+      updateDashboard();
+      showPage("home");
+      return;
     }
 
-    // New user coins
+    // New user
     let coins = 20;
     const userCode = "REF"+Math.floor(Math.random()*100000);
+    const newUser = {email, phone, coins, code:userCode, upi:"", lastCollectDate:""};
 
     // Referral bonus
     if(refInput){
-        const refUserRef = ref(db, 'users_by_code/' + refInput);
-        const refSnap = await get(refUserRef);
-        if(refSnap.exists()){
-            update(refUserRef, { coins: refSnap.val().coins + REF_BONUS });
-            alert("Referral accepted! 200 coins added to referrer");
+      const refUserRef = db.ref('users_by_code/'+refInput);
+      refUserRef.get().then(rsnap=>{
+        if(rsnap.exists()){
+          const prevCoins = rsnap.val().coins || 0;
+          refUserRef.update({coins: prevCoins + REF_BONUS});
+          alert("Referral accepted! 200 coins added to referrer");
         }
+      });
     }
 
-    const newUser = {
-        email,
-        phone,
-        coins,
-        code: userCode,
-        upi: "",
-        lastCollectDate: ""
-    };
-
-    await set(userRef, newUser);
-    await set(ref(db,'users_by_code/'+userCode), newUser);
+    userRef.set(newUser);
+    db.ref('users_by_code/'+userCode).set(newUser);
 
     currentUserData = newUser;
     updateDashboard();
     showPage("home");
+  });
 }
 
-// =======================
-// UPDATE DASHBOARD / BALANCE
-// =======================
+/* =======================
+   UPDATE DASHBOARD / BALANCE
+======================= */
 function updateDashboard(){
-    if(!currentUserData) return;
-    document.getElementById("userEmail").innerText = currentUserData.email;
-    document.getElementById("refCode").innerText = currentUserData.code;
-    document.getElementById("coins").innerText = currentUserData.coins;
-    document.getElementById("coinsRs").innerText = (currentUserData.coins*COIN_TO_RS).toFixed(0);
-    document.getElementById("walletCoins").innerText = currentUserData.coins;
-    document.getElementById("walletRs").innerText = (currentUserData.coins*COIN_TO_RS).toFixed(0);
+  if(!currentUserData) return;
+  document.getElementById("userEmail").innerText = currentUserData.email;
+  document.getElementById("refCode").innerText = currentUserData.code;
+  document.getElementById("coins").innerText = currentUserData.coins;
+  document.getElementById("coinsRs").innerText = (currentUserData.coins*COIN_TO_RS).toFixed(0);
+  document.getElementById("walletCoins").innerText = currentUserData.coins;
+  document.getElementById("walletRs").innerText = (currentUserData.coins*COIN_TO_RS).toFixed(0);
 }
 
-// =======================
-// COLLECT DAILY COINS
-// =======================
-async function collectCoins(){
-    if(!currentUserData) return;
+/* =======================
+   COLLECT DAILY COINS
+======================= */
+function collectCoins(){
+  if(!currentUserData) return;
+  const today = new Date().toDateString();
+  if(currentUserData.lastCollectDate === today){ alert("Already collected today!"); return; }
 
-    const today = new Date().toDateString();
-    if(currentUserData.lastCollectDate === today){ alert("Already collected today!"); return; }
-
-    window.open(AD_LINK,"_blank");
-
-    currentUserData.coins += 20;
-    currentUserData.lastCollectDate = today;
-    await update(ref(db,'users/'+currentUserData.phone),{
-        coins: currentUserData.coins,
-        lastCollectDate: today
-    });
-
-    updateDashboard();
-    alert("20 Coins added!");
+  window.open(AD_LINK,"_blank");
+  currentUserData.coins += 20;
+  currentUserData.lastCollectDate = today;
+  db.ref('users/'+currentUserData.phone).update({
+    coins: currentUserData.coins,
+    lastCollectDate: today
+  });
+  updateDashboard();
+  alert("20 Coins added!");
 }
 
-// =======================
-// SAVE UPI FUNCTION
-// =======================
-async function saveUPI(){
-    if(!currentUserData) return;
-    const upi = document.getElementById("upi").value.trim();
-    if(!upi){ alert("Enter UPI"); return; }
-    currentUserData.upi = upi;
-    await update(ref(db,'users/'+currentUserData.phone),{upi});
-    document.getElementById("upiSaved").innerText = "UPI Saved ✔";
+/* =======================
+   SAVE UPI
+======================= */
+function saveUPI(){
+  if(!currentUserData) return;
+  const upi = document.getElementById("upi").value.trim();
+  if(!upi){ alert("Enter UPI"); return; }
+  currentUserData.upi = upi;
+  db.ref('users/'+currentUserData.phone).update({upi});
+  document.getElementById("upiSaved").innerText = "UPI Saved ✔";
 }
 
-// =======================
-// WITHDRAW FUNCTION
-// =======================
-async function withdraw(){
-    if(!currentUserData) return;
-    const amt = parseInt(document.getElementById("withdrawAmount").value);
-    if(isNaN(amt) || amt<MIN_WITHDRAW){ alert("Minimum withdraw is "+MIN_WITHDRAW+" coins (~₹"+(MIN_WITHDRAW*COIN_TO_RS)+")"); return; }
-    if(amt > currentUserData.coins){ alert("Not enough coins"); return; }
+/* =======================
+   WITHDRAW
+======================= */
+function withdraw(){
+  if(!currentUserData) return;
+  const amt = parseInt(document.getElementById("withdrawAmount").value);
+  if(isNaN(amt) || amt<MIN_WITHDRAW){ alert("Minimum withdraw is "+MIN_WITHDRAW+" coins (~₹"+(MIN_WITHDRAW*COIN_TO_RS)+")"); return; }
+  if(amt > currentUserData.coins){ alert("Not enough coins"); return; }
 
-    currentUserData.coins -= amt;
-    await update(ref(db,'users/'+currentUserData.phone),{coins:currentUserData.coins});
-    updateDashboard();
-    alert("Withdraw request sent for "+amt+" coins (~₹"+(amt*COIN_TO_RS)+")");
+  currentUserData.coins -= amt;
+  db.ref('users/'+currentUserData.phone).update({coins: currentUserData.coins});
+  updateDashboard();
+  alert("Withdraw request sent for "+amt+" coins (~₹"+(amt*COIN_TO_RS)+")");
 }
 
-// =======================
-// LOGOUT FUNCTION
-// =======================
+/* =======================
+   LOGOUT
+======================= */
 function logout(){
-    currentUserData = null;
-    showPage("login");
+  currentUserData = null;
+  showPage("login");
 }
 </script>
 </body>
