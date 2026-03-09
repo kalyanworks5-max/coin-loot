@@ -1,240 +1,355 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Coin Loot</title>
+
 <style>
-/* =======================
-    GLOBAL STYLES
-======================= */
-body{margin:0;font-family:Arial;background:linear-gradient(135deg,#141e30,#243b55);color:white;overflow:hidden;}
-.page{display:none;height:100vh;padding-top:80px;text-align:center;}
-.active{display:block;}
-input{width:90%;padding:10px;margin:10px;border-radius:10px;border:none;autocomplete:off;}
-button{padding:10px 20px;border:none;border-radius:25px;background:gold;color:black;cursor:pointer;}
-.card{background:rgba(255,255,255,0.1);padding:15px;margin:15px;border-radius:12px;}
-.balance{font-size:40px;margin:20px;}
-.nav{position:fixed;bottom:0;width:100%;height:65px;background:#111;display:flex;justify-content:space-around;align-items:center;}
-.nav button{background:none;color:white;font-size:16px;}
-.coin{position:absolute;color:gold;font-size:22px;animation:float 7s linear infinite;}
-@keyframes float{0%{transform:translateY(100vh) rotate(0deg)}100%{transform:translateY(-10vh) rotate(360deg)}}
+
+/* ===== GLOBAL DESIGN ===== */
+
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#141e30,#243b55);
+color:white;
+text-align:center;
+}
+
+/* ===== PAGE SYSTEM ===== */
+
+.page{
+display:none;
+padding-top:80px;
+}
+
+.active{
+display:block;
+}
+
+/* ===== INPUT BOX ===== */
+
+input{
+width:85%;
+padding:10px;
+margin:10px;
+border-radius:10px;
+border:none;
+}
+
+/* ===== BUTTON ===== */
+
+button{
+padding:10px 20px;
+border:none;
+border-radius:25px;
+background:gold;
+cursor:pointer;
+}
+
+/* ===== CARD ===== */
+
+.card{
+background:rgba(255,255,255,0.1);
+margin:15px;
+padding:15px;
+border-radius:12px;
+}
+
+/* ===== NAVIGATION ===== */
+
+.nav{
+position:fixed;
+bottom:0;
+width:100%;
+background:#111;
+display:flex;
+justify-content:space-around;
+padding:10px;
+}
+
+.nav button{
+background:none;
+color:white;
+}
+
+/* ===== COINS TEXT ===== */
+
+.balance{
+font-size:40px;
+margin:20px;
+}
+
 </style>
 </head>
+
 <body>
 
-<!-- FLOATING COINS -->
-<div class="coin" style="left:10%">🪙</div>
-<div class="coin" style="left:30%;animation-delay:1s">🪙</div>
-<div class="coin" style="left:50%;animation-delay:2s">🪙</div>
-<div class="coin" style="left:70%;animation-delay:3s">🪙</div>
-<div class="coin" style="left:90%;animation-delay:4s">🪙</div>
+<!-- ===== RUNNING TEXT ===== -->
 
-<!-- LOGIN / SIGNUP -->
+<marquee style="background:black;color:gold;padding:10px;">
+Coins never reset. Convert coins to real money on the 30th of this month.
+20 Coins = ₹0.50. Collect coins every 4 hours.
+</marquee>
+
+<!-- ===== LOGIN PAGE ===== -->
+
 <div id="login" class="page active">
-<div class="card">
-<h2>Coin Loot</h2>
-<input id="email" placeholder="Email">
-<input id="phone" placeholder="Phone Number">
-<input id="refInput" placeholder="Referral Code (Optional)">
+
+<h2>Coin Loot Login</h2>
+
+<input id="name" placeholder="Enter Name">
+
+<input id="phone" placeholder="Enter Phone Number">
+
 <br>
-<button onclick="signup()">Signup / Login</button>
-</div>
+
+<button onclick="loginUser()">Login / Signup</button>
+
 </div>
 
-<!-- HOME PAGE -->
+<!-- ===== HOME PAGE ===== -->
+
 <div id="home" class="page">
+
 <h2>Coin Loot</h2>
-<div class="balance">Ʉ <span id="coins">0</span> (~₹<span id="coinsRs">0</span>)</div>
-<button class="collect" onclick="collectCoins()">Collect Daily Coins</button>
+
+<div class="balance">
+Coins : <span id="coins">0</span>
 </div>
 
-<!-- WALLET / BANK PAGE -->
+<div>
+Value ₹ <span id="value">0</span>
+</div>
+
+<br>
+
+<button onclick="collectCoins()">Collect Coins</button>
+
+</div>
+
+<!-- ===== WALLET PAGE ===== -->
+
 <div id="wallet" class="page">
+
 <h2>Wallet</h2>
-<div class="card">Balance : Ʉ <span id="walletCoins">0</span> (~₹<span id="walletRs">0</span>)</div>
+
 <div class="card">
-<h3>Connect UPI / Bank</h3>
-<input id="upi" placeholder="Enter UPI ID">
-<button onclick="saveUPI()">Save UPI</button>
-<p id="upiSaved"></p>
-</div>
-<div class="card">
-<h3>Withdraw Coins</h3>
-<input id="withdrawAmount" placeholder="Enter Coins">
-<button onclick="withdraw()">Withdraw</button>
-</div>
+Coins Balance : <span id="walletCoins">0</span>
 </div>
 
-<!-- PROFILE PAGE -->
+<div class="card">
+Value ₹ : <span id="walletValue">0</span>
+</div>
+
+<div class="card">
+20 Coins = ₹0.50  
+Coins convert to money on 30th.
+</div>
+
+</div>
+
+<!-- ===== PROFILE PAGE ===== -->
+
 <div id="profile" class="page">
+
 <h2>Profile</h2>
-<div class="card">Email : <span id="userEmail"></span></div>
+
 <div class="card">
-<h3>Referral Code</h3>
-Your Code: <b id="refCode"></b>
-</div>
-<div class="card"><h3>Contact Support</h3>support@email.com</div>
-<div class="card"><button onclick="logout()">Logout</button></div>
+Name : <span id="pname"></span>
 </div>
 
-<!-- NAVIGATION -->
+<div class="card">
+Phone : <span id="pphone"></span>
+</div>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+<!-- ===== NAVIGATION BAR ===== -->
+
 <div class="nav">
+
 <button onclick="showPage('home')">Home</button>
+
 <button onclick="showPage('wallet')">Wallet</button>
+
 <button onclick="showPage('profile')">Profile</button>
+
 </div>
 
-<!-- FIREBASE CDN -->
-<script src="https://www.gstatic.com/firebasejs/10.3.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.3.0/firebase-database.js"></script>
+<!-- ===== FIREBASE LIBRARIES ===== -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
-/* =======================
-   FIREBASE SETUP
-======================= */
+
+/* ===== FIREBASE CONFIG ===== */
+
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "XXX",
-  appId: "XXX"
+
+apiKey: "AIzaSyBhMUIld4qnt42X0BWF_kYZr2R2olDghts",
+
+authDomain: "coinloot-f15f3.firebaseapp.com",
+
+databaseURL: "https://coinloot-f15f3-default-rtdb.firebaseio.com",
+
+projectId: "coinloot-f15f3",
+
+storageBucket: "coinloot-f15f3.firebasestorage.app",
+
+messagingSenderId: "939943880173",
+
+appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4",
+
+measurementId: "G-XMZG9Q2128"
+
 };
+
+/* ===== INITIALIZE FIREBASE ===== */
+
 firebase.initializeApp(firebaseConfig);
+
 const db = firebase.database();
 
-/* =======================
-   GLOBAL VARIABLES
-======================= */
-const AD_LINK = "https://YOUR_MONETAG_LINK";
-const REF_BONUS = 200;
-const MIN_WITHDRAW = 1000; // coins = 500 Rs
-const COIN_TO_RS = 0.5;
+/* ===== GLOBAL VARIABLES ===== */
 
-let currentUserData = null;
+let currentUser = null
 
-/* =======================
-   PAGE NAVIGATION
-======================= */
+const COIN_VALUE = 0.025
+const COLLECT_REWARD = 20
+const FOUR_HOURS = 4 * 60 * 60 * 1000
+
+/* ===== REWARD AD LINK ===== */
+
+const AD_LINK = "https://your-reward-ad-link.com"
+
+/* ===== PAGE NAVIGATION ===== */
+
 function showPage(page){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.getElementById(page).classList.add("active");
+
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"))
+
+document.getElementById(page).classList.add("active")
+
 }
 
-/* =======================
-   SIGNUP / LOGIN FUNCTION
-======================= */
-function signup(){
-  const email = document.getElementById("email").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const refInput = document.getElementById("refInput").value.trim().toUpperCase();
+/* ===== LOGIN FUNCTION ===== */
 
-  if(!email || !phone){ alert("Fill all fields"); return; }
+function loginUser(){
 
-  const userRef = db.ref('users/'+phone);
-  userRef.get().then(snapshot=>{
-    if(snapshot.exists()){
-      alert("Account already exists");
-      currentUserData = snapshot.val();
-      updateDashboard();
-      showPage("home");
-      return;
-    }
+const name = document.getElementById("name").value
+const phone = document.getElementById("phone").value
 
-    // New user
-    let coins = 20;
-    const userCode = "REF"+Math.floor(Math.random()*100000);
-    const newUser = {email, phone, coins, code:userCode, upi:"", lastCollectDate:""};
-
-    // Referral bonus
-    if(refInput){
-      const refUserRef = db.ref('users_by_code/'+refInput);
-      refUserRef.get().then(rsnap=>{
-        if(rsnap.exists()){
-          const prevCoins = rsnap.val().coins || 0;
-          refUserRef.update({coins: prevCoins + REF_BONUS});
-          alert("Referral accepted! 200 coins added to referrer");
-        }
-      });
-    }
-
-    userRef.set(newUser);
-    db.ref('users_by_code/'+userCode).set(newUser);
-
-    currentUserData = newUser;
-    updateDashboard();
-    showPage("home");
-  });
+if(!name || !phone){
+alert("Enter name and phone")
+return
 }
 
-/* =======================
-   UPDATE DASHBOARD / BALANCE
-======================= */
-function updateDashboard(){
-  if(!currentUserData) return;
-  document.getElementById("userEmail").innerText = currentUserData.email;
-  document.getElementById("refCode").innerText = currentUserData.code;
-  document.getElementById("coins").innerText = currentUserData.coins;
-  document.getElementById("coinsRs").innerText = (currentUserData.coins*COIN_TO_RS).toFixed(0);
-  document.getElementById("walletCoins").innerText = currentUserData.coins;
-  document.getElementById("walletRs").innerText = (currentUserData.coins*COIN_TO_RS).toFixed(0);
+const ref = db.ref("users/"+phone)
+
+ref.get().then(snap=>{
+
+if(snap.exists()){
+
+currentUser = snap.val()
+
+}else{
+
+currentUser = {
+name:name,
+phone:phone,
+coins:0,
+lastCollect:0
 }
 
-/* =======================
-   COLLECT DAILY COINS
-======================= */
+ref.set(currentUser)
+
+}
+
+updateUI()
+showPage("home")
+
+})
+
+}
+
+/* ===== UPDATE UI ===== */
+
+function updateUI(){
+
+document.getElementById("coins").innerText=currentUser.coins
+document.getElementById("walletCoins").innerText=currentUser.coins
+
+let value=(currentUser.coins*COIN_VALUE).toFixed(2)
+
+document.getElementById("value").innerText=value
+document.getElementById("walletValue").innerText=value
+
+document.getElementById("pname").innerText=currentUser.name
+document.getElementById("pphone").innerText=currentUser.phone
+
+}
+
+/* ===== COLLECT COINS ===== */
+
 function collectCoins(){
-  if(!currentUserData) return;
-  const today = new Date().toDateString();
-  if(currentUserData.lastCollectDate === today){ alert("Already collected today!"); return; }
 
-  window.open(AD_LINK,"_blank");
-  currentUserData.coins += 20;
-  currentUserData.lastCollectDate = today;
-  db.ref('users/'+currentUserData.phone).update({
-    coins: currentUserData.coins,
-    lastCollectDate: today
-  });
-  updateDashboard();
-  alert("20 Coins added!");
+let now = Date.now()
+
+if(now-currentUser.lastCollect < FOUR_HOURS){
+
+let remain = FOUR_HOURS-(now-currentUser.lastCollect)
+
+let minutes = Math.floor(remain/60000)
+
+alert("Come back after "+minutes+" minutes")
+
+return
 }
 
-/* =======================
-   SAVE UPI
-======================= */
-function saveUPI(){
-  if(!currentUserData) return;
-  const upi = document.getElementById("upi").value.trim();
-  if(!upi){ alert("Enter UPI"); return; }
-  currentUserData.upi = upi;
-  db.ref('users/'+currentUserData.phone).update({upi});
-  document.getElementById("upiSaved").innerText = "UPI Saved ✔";
+/* ===== OPEN AD ===== */
+
+window.open(AD_LINK,"_blank")
+
+/* ===== WAIT FOR AD ===== */
+
+setTimeout(()=>{
+
+currentUser.coins += COLLECT_REWARD
+currentUser.lastCollect = now
+
+db.ref("users/"+currentUser.phone).update({
+
+coins:currentUser.coins,
+lastCollect:now
+
+})
+
+updateUI()
+
+alert("20 coins added!")
+
+},15000)
+
 }
 
-/* =======================
-   WITHDRAW
-======================= */
-function withdraw(){
-  if(!currentUserData) return;
-  const amt = parseInt(document.getElementById("withdrawAmount").value);
-  if(isNaN(amt) || amt<MIN_WITHDRAW){ alert("Minimum withdraw is "+MIN_WITHDRAW+" coins (~₹"+(MIN_WITHDRAW*COIN_TO_RS)+")"); return; }
-  if(amt > currentUserData.coins){ alert("Not enough coins"); return; }
+/* ===== LOGOUT ===== */
 
-  currentUserData.coins -= amt;
-  db.ref('users/'+currentUserData.phone).update({coins: currentUserData.coins});
-  updateDashboard();
-  alert("Withdraw request sent for "+amt+" coins (~₹"+(amt*COIN_TO_RS)+")");
-}
-
-/* =======================
-   LOGOUT
-======================= */
 function logout(){
-  currentUserData = null;
-  showPage("login");
+
+currentUser=null
+
+showPage("login")
+
 }
+
 </script>
+
 </body>
 </html>
+```
