@@ -1,45 +1,38 @@
+//login page
+
 <!DOCTYPE html>
 <html>
 <head>
-<title>Coin Loot</title>
+<title>Coin Loot Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 
-/* ===============================
-🎨 PAGE DESIGN
-================================ */
 body{
 font-family:Arial;
-background:#111;
+background:linear-gradient(135deg,#ff9800,#ff5722);
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
 color:white;
 text-align:center;
-padding:30px;
 }
 
-/* ===============================
-🔘 BUTTON STYLE
-================================ */
+.box{
+background:#00000090;
+padding:40px;
+border-radius:15px;
+}
+
 button{
-background:#ff9800;
+background:#ffffff;
+color:black;
 border:none;
-padding:15px;
+padding:15px 25px;
 font-size:18px;
-border-radius:8px;
-color:white;
-cursor:pointer;
-margin:10px;
-}
-
-/* ===============================
-🪙 COINS BOX
-================================ */
-#coinsBox{
-font-size:25px;
-margin-top:20px;
-background:#222;
-padding:20px;
 border-radius:10px;
+cursor:pointer;
 }
 
 </style>
@@ -47,44 +40,17 @@ border-radius:10px;
 
 <body>
 
-<!-- ===============================
-🪙 WEBSITE TITLE
-================================ -->
-<h1>Coin Loot</h1>
+<div class="box">
 
-<!-- ===============================
-🔐 GOOGLE LOGIN BUTTON
-================================ -->
+<h1>Coin Loot</h1>
+<p>Login to Start Earning Coins</p>
+
 <button onclick="googleLogin()">Login With Google</button>
 
-<!-- ===============================
-👤 USER NAME SHOW
-================================ -->
-<h3 id="username"></h3>
-
-<!-- ===============================
-🪙 COINS DISPLAY
-================================ -->
-<div id="coinsBox">
-Coins: <span id="coins">0</span>
 </div>
-
-<!-- ===============================
-📺 WATCH AD BUTTON
-================================ -->
-<button onclick="watchAd()">Watch Ad +100 Coins</button>
-
-<!-- ===============================
-🎁 DAILY REWARD BUTTON
-================================ -->
-<button onclick="dailyReward()">Daily Reward +500</button>
 
 
 <script type="module">
-
-/* ===============================
-🔥 FIREBASE IMPORT
-================================ */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
@@ -93,19 +59,6 @@ getAuth,
 GoogleAuthProvider,
 signInWithPopup
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-import { 
-getDatabase,
-ref,
-set,
-get,
-update
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-
-/* ===============================
-⚙️ FIREBASE CONFIG
-================================ */
 
 const firebaseConfig = {
 
@@ -119,23 +72,9 @@ appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4"
 
 };
 
-
-/* ===============================
-🚀 FIREBASE START
-================================ */
-
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
-
-const db = getDatabase(app);
-
-let currentUser = null;
-
-
-/* ===============================
-🔐 GOOGLE LOGIN
-================================ */
 
 window.googleLogin = function(){
 
@@ -143,38 +82,11 @@ const provider = new GoogleAuthProvider();
 
 signInWithPopup(auth,provider)
 
-.then(async(result)=>{
+.then((result)=>{
 
-const user = result.user;
+/* Login success → Home page */
 
-currentUser = user;
-
-document.getElementById("username").innerText =
-"Welcome " + user.displayName;
-
-const userRef = ref(db,"users/"+user.uid);
-
-const snap = await get(userRef);
-
-if(!snap.exists()){
-
-set(userRef,{
-name:user.displayName,
-email:user.email,
-coins:0,
-lastReward:0
-});
-
-document.getElementById("coins").innerText = 0;
-
-}
-
-else{
-
-document.getElementById("coins").innerText =
-snap.val().coins;
-
-}
+window.location = "home.html";
 
 })
 
@@ -186,28 +98,121 @@ alert(error.message);
 
 }
 
+</script>
 
-/* ===============================
-📺 WATCH AD + MONETAG
-================================ */
+</body>
+</html>
 
-window.watchAd = async function(){
+// home page
 
-if(!currentUser){
+<!DOCTYPE html>
+<html>
+<head>
+<title>Coin Loot Home</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-alert("Login First");
+<style>
 
-return;
+body{
+font-family:Arial;
+background:#111;
+color:white;
+text-align:center;
+padding:40px;
+}
+
+button{
+background:#ff9800;
+border:none;
+padding:15px;
+font-size:18px;
+border-radius:10px;
+color:white;
+cursor:pointer;
+margin:10px;
+}
+
+#coins{
+font-size:30px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Coin Loot Dashboard</h1>
+
+<h2>Coins: <span id="coins">0</span></h2>
+
+<button onclick="watchAd()">Watch Ad +100 Coins</button>
+
+<button onclick="dailyReward()">Daily Reward +500</button>
+
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import { 
+getAuth,
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import { 
+getDatabase,
+ref,
+get,
+update
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyBhMUIld4qnt42X0BWF_kYZr2R2olDghts",
+authDomain: "coinloot-f15f3.firebaseapp.com",
+databaseURL: "https://coinloot-f15f3-default-rtdb.firebaseio.com",
+projectId: "coinloot-f15f3",
+storageBucket: "coinloot-f15f3.firebasestorage.app",
+messagingSenderId: "939943880173",
+appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getDatabase(app);
+
+let currentUser;
+
+onAuthStateChanged(auth, async(user)=>{
+
+if(user){
+
+currentUser = user;
+
+const userRef = ref(db,"users/"+user.uid);
+
+const snap = await get(userRef);
+
+if(snap.exists()){
+
+document.getElementById("coins").innerText =
+snap.val().coins;
 
 }
 
-/* Monetag Ad Open */
+}
+
+});
+
+
+window.watchAd = async function(){
 
 window.open("https://omg10.com/4/10701853","_blank");
 
-
-let coins =
-parseInt(document.getElementById("coins").innerText);
+let coins = parseInt(document.getElementById("coins").innerText);
 
 coins += 100;
 
@@ -215,59 +220,22 @@ document.getElementById("coins").innerText = coins;
 
 const userRef = ref(db,"users/"+currentUser.uid);
 
-update(userRef,{
-coins:coins
-});
-
-alert("Ad Watched +100 Coins Added");
+update(userRef,{coins:coins});
 
 }
 
-
-/* ===============================
-🎁 DAILY REWARD
-================================ */
 
 window.dailyReward = async function(){
 
-if(!currentUser){
+let coins = parseInt(document.getElementById("coins").innerText);
 
-alert("Login First");
-
-return;
-
-}
-
-const userRef = ref(db,"users/"+currentUser.uid);
-
-const snap = await get(userRef);
-
-let data = snap.val();
-
-let lastReward = data.lastReward || 0;
-
-let now = Date.now();
-
-let hours = (now - lastReward) / 1000 / 60 / 60;
-
-if(hours < 24){
-
-alert("Daily reward already claimed");
-
-return;
-
-}
-
-let coins = data.coins + 500;
+coins += 500;
 
 document.getElementById("coins").innerText = coins;
 
-update(userRef,{
-coins:coins,
-lastReward:now
-});
+const userRef = ref(db,"users/"+currentUser.uid);
 
-alert("500 Daily Reward Added");
+update(userRef,{coins:coins});
 
 }
 
