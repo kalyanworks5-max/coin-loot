@@ -1,84 +1,117 @@
 <!DOCTYPE html>
-<html lang="te">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoinLoot Pro</title>
-    <!-- ఇక్కడ నీ MONETAG INTERSTITIAL SCRIPT ని పేస్ట్ చెయ్ (Dashboard లో ఇస్తారు) -->
-    <script src='https://alwingulla.com' data-cfasync='false' async></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coin Loot Login</title>
 
-    <style>
-        :root { --gold: #FFD700; --dark: #121212; }
-        body { font-family: 'Poppins', sans-serif; background: var(--dark); color: white; text-align: center; margin: 0; padding: 20px; }
-        .wallet { background: #1e1e1e; padding: 30px; border-radius: 25px; border: 2px solid var(--gold); margin-top: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .balance-value { font-size: 55px; font-weight: bold; color: var(--gold); margin: 15px 0; text-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
-        .claim-btn { background: linear-gradient(135deg, #FFD700, #FFA500); border: none; color: black; padding: 20px; width: 100%; font-size: 22px; font-weight: bold; border-radius: 50px; cursor: pointer; margin-top: 20px; transition: 0.3s; }
-        .claim-btn:disabled { background: #444; color: #888; }
-        .timer { margin-top: 20px; font-size: 18px; color: #ff4d4d; font-weight: bold; }
-    </style>
+<style>
+
+/* Light blue attractive background */
+
+body{
+margin:0;
+height:100vh;
+background:linear-gradient(135deg,#b9e6ff,#7fd3ff,#5ac8ff);
+display:flex;
+align-items:center;
+justify-content:center;
+font-family:Arial;
+overflow:hidden;
+}
+
+/* Login button */
+
+button{
+padding:16px 32px;
+font-size:18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+background:white;
+color:#1a73e8;
+font-weight:bold;
+box-shadow:0 5px 20px rgba(0,0,0,0.2);
+z-index:2;
+}
+
+/* Silver coin style */
+
+.coin{
+position:absolute;
+width:50px;
+height:50px;
+border-radius:50%;
+background:radial-gradient(circle at 30% 30%, #ffffff, #cfcfcf, #9e9e9e);
+box-shadow:inset 0 0 8px rgba(0,0,0,0.3),0 0 8px rgba(255,255,255,0.6);
+animation:floatCoins linear infinite;
+opacity:0.9;
+}
+
+/* coin floating animation */
+
+@keyframes floatCoins{
+
+0%{
+transform:translateY(110vh) rotate(0deg);
+}
+
+100%{
+transform:translateY(-20vh) rotate(360deg);
+}
+
+}
+
+</style>
 </head>
+
 <body>
 
-<div class="wallet">
-    <p style="color:#aaa;">CURRENT WALLET</p>
-    <div class="balance-value">🟡 <span id="coinCount">0</span></div>
-    
-    <button id="claimBtn" class="claim-btn" onclick="showAdAndCollect()">COLLECT 20 COINS</button>
-    <div id="timerMsg" class="timer"></div>
-</div>
+<!-- silver coins animation -->
 
-<audio id="cashSound" src="https://www.soundjay.com"></audio>
-<audio id="alertSound" src="https://www.soundjay.com"></audio>
+<div class="coin" style="left:10%;animation-duration:9s;"></div>
+<div class="coin" style="left:20%;animation-duration:7s;"></div>
+<div class="coin" style="left:30%;animation-duration:10s;"></div>
+<div class="coin" style="left:40%;animation-duration:8s;"></div>
+<div class="coin" style="left:50%;animation-duration:11s;"></div>
+<div class="coin" style="left:60%;animation-duration:6s;"></div>
+<div class="coin" style="left:70%;animation-duration:9s;"></div>
+<div class="coin" style="left:80%;animation-duration:7s;"></div>
+<div class="coin" style="left:90%;animation-duration:10s;"></div>
 
-<script>
-    let coins = parseInt(localStorage.getItem('userCoins')) || 0;
-    document.getElementById('coinCount').innerText = coins;
+<button onclick="googleLogin()">Login With Google</button>
 
-    function showAdAndCollect() {
-        // 1. Monetag Interstitial Ad ని పిలవడం
-        if (typeof show_8884351 === 'function') { 
-            show_8884351().then(() => {
-                processCoins(); // యాడ్ చూశాక కాయిన్స్ ఇస్తుంది
-            });
-        } else {
-            // ఒకవేళ యాడ్ లోడ్ అవ్వకపోతే డైరెక్ట్ గా కాయిన్స్ ఇస్తుంది (టెస్టింగ్ కోసం)
-            processCoins();
-        }
-    }
+<script type="module">
 
-    function processCoins() {
-        coins += 20;
-        localStorage.setItem('userCoins', coins);
-        document.getElementById('coinCount').innerText = coins;
-        document.getElementById('cashSound').play();
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        let readyTime = Date.now() + (2 * 60 * 60 * 1000); // 2 Hours
-        localStorage.setItem('nextClaimTime', readyTime);
-        startTimer();
-    }
+const firebaseConfig = {
+apiKey:"YOUR_API_KEY",
+authDomain:"coinloot-f15f3.firebaseapp.com",
+projectId:"coinloot-f15f3",
+};
 
-    function startTimer() {
-        const btn = document.getElementById('claimBtn');
-        const msg = document.getElementById('timerMsg');
-        
-        setInterval(() => {
-            let nextTime = localStorage.getItem('nextClaimTime');
-            let diff = nextTime - Date.now();
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-            if (nextTime && diff > 0) {
-                btn.disabled = true;
-                let h = Math.floor(diff / 3600000);
-                let m = Math.floor((diff % 3600000) / 60000);
-                let s = Math.floor((diff % 60000) / 1000);
-                msg.innerText = `Next Mining in: ${h}h ${m}m ${s}s`;
-            } else {
-                if(btn.disabled) { document.getElementById('alertSound').play(); }
-                btn.disabled = false;
-                msg.innerText = "Ready to Loot! 💰";
-            }
-        }, 1000);
-    }
-    window.onload = startTimer;
+window.googleLogin=function(){
+
+const provider=new GoogleAuthProvider();
+
+signInWithPopup(auth,provider)
+.then(()=>{
+
+window.location="home.html";
+
+})
+.catch((error)=>{
+
+alert(error.message);
+
+});
+
+}
+
 </script>
 
 </body>
