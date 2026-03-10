@@ -68,54 +68,64 @@ animation:coinFloat 6s ease-in-out infinite;
 
 }
 
-/* ===== Login Button ===== */
+<!-- Login Button -->
 
-.login-btn{
+<button class="login-btn" onclick="googleLogin()">
+<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
+Login With Google
+</button>
 
-display:flex;
-align-items:center;
-gap:10px;
+<script type="module">
 
-padding:16px 32px;
+/* Firebase Imports */
 
-border:none;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-background:white;
+/* Firebase Config (YOUR PROJECT DETAILS) */
 
-color:#4285F4;
+const firebaseConfig = {
+  apiKey: "AIzaSyBhMUIld4qnt42X0BWF_kYZr2R2olDghts",
+  authDomain: "coinloot-f15f3.firebaseapp.com",
+  projectId: "coinloot-f15f3",
+  storageBucket: "coinloot-f15f3.appspot.com",
+  messagingSenderId: "939943880173",
+  appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4",
+  measurementId: "G-XMZG9Q2128"
+};
 
-font-size:18px;
+/* Initialize Firebase */
 
-font-weight:bold;
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-border-radius:40px;
+/* Google Login Function */
 
-cursor:pointer;
+window.googleLogin = function(){
 
-box-shadow:0 10px 30px rgba(0,0,0,0.6);
+const provider = new GoogleAuthProvider();
 
-transition:0.25s;
+signInWithPopup(auth, provider)
 
-z-index:5;
+.then((result)=>{
+
+// Login Success → Go To Home Page
+window.location = "home.html";
+
+})
+
+.catch((error)=>{
+
+alert(error.message);
+
+});
 
 }
 
-.login-btn:hover{
+</script>
 
-transform:scale(1.08);
-
-box-shadow:0 15px 40px rgba(0,0,0,0.7);
-
-}
-
-.login-btn img{
-width:22px;
-}
-
-</style>
-</head>
-
-<body>
+</body>
+</html>
 
 <!-- Silver Coins with Custom Currency Symbol -->
 
@@ -408,3 +418,4 @@ menu.style.display="block";
 
 </body>
 </html>
+
