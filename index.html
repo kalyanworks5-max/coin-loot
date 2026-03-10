@@ -1,108 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="te">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoinLoot - Earn & Track</title>
+    <title>CoinLoot Pro</title>
+    <!-- ఇక్కడ నీ MONETAG INTERSTITIAL SCRIPT ని పేస్ట్ చెయ్ (Dashboard లో ఇస్తారు) -->
+    <script src='https://alwingulla.com' data-cfasync='false' async></script>
+
     <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #f4f7f6; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        button { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px; }
-        .hidden { display: none; }
-        #userCoins { font-size: 24px; color: #2ecc71; font-weight: bold; }
+        :root { --gold: #FFD700; --dark: #121212; }
+        body { font-family: 'Poppins', sans-serif; background: var(--dark); color: white; text-align: center; margin: 0; padding: 20px; }
+        .wallet { background: #1e1e1e; padding: 30px; border-radius: 25px; border: 2px solid var(--gold); margin-top: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .balance-value { font-size: 55px; font-weight: bold; color: var(--gold); margin: 15px 0; text-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
+        .claim-btn { background: linear-gradient(135deg, #FFD700, #FFA500); border: none; color: black; padding: 20px; width: 100%; font-size: 22px; font-weight: bold; border-radius: 50px; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .claim-btn:disabled { background: #444; color: #888; }
+        .timer { margin-top: 20px; font-size: 18px; color: #ff4d4d; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>CoinLoot 💰</h1>
+<div class="wallet">
+    <p style="color:#aaa;">CURRENT WALLET</p>
+    <div class="balance-value">🟡 <span id="coinCount">0</span></div>
+    
+    <button id="claimBtn" class="claim-btn" onclick="showAdAndCollect()">COLLECT 20 COINS</button>
+    <div id="timerMsg" class="timer"></div>
+</div>
+
+<audio id="cashSound" src="https://www.soundjay.com"></audio>
+<audio id="alertSound" src="https://www.soundjay.com"></audio>
+
+<script>
+    let coins = parseInt(localStorage.getItem('userCoins')) || 0;
+    document.getElementById('coinCount').innerText = coins;
+
+    function showAdAndCollect() {
+        // 1. Monetag Interstitial Ad ని పిలవడం
+        if (typeof show_8884351 === 'function') { 
+            show_8884351().then(() => {
+                processCoins(); // యాడ్ చూశాక కాయిన్స్ ఇస్తుంది
+            });
+        } else {
+            // ఒకవేళ యాడ్ లోడ్ అవ్వకపోతే డైరెక్ట్ గా కాయిన్స్ ఇస్తుంది (టెస్టింగ్ కోసం)
+            processCoins();
+        }
+    }
+
+    function processCoins() {
+        coins += 20;
+        localStorage.setItem('userCoins', coins);
+        document.getElementById('coinCount').innerText = coins;
+        document.getElementById('cashSound').play();
+
+        let readyTime = Date.now() + (2 * 60 * 60 * 1000); // 2 Hours
+        localStorage.setItem('nextClaimTime', readyTime);
+        startTimer();
+    }
+
+    function startTimer() {
+        const btn = document.getElementById('claimBtn');
+        const msg = document.getElementById('timerMsg');
         
-        <!-- Login Section -->
-        <div id="loginSection">
-            <p>వెల్కమ్! మీ పాయింట్స్ చూసుకోవడానికి లాగిన్ అవ్వండి.</p>
-            <button id="loginBtn">Login with Google</button>
-        </div>
+        setInterval(() => {
+            let nextTime = localStorage.getItem('nextClaimTime');
+            let diff = nextTime - Date.now();
 
-        <!-- Dashboard Section -->
-        <div id="dashboardSection" class="hidden">
-            <img id="userPhoto" src="" width="60" style="border-radius: 50%;">
-            <h3 id="userName">Loading...</h3>
-            <p>మీ ప్రస్తుత కాయిన్స్:</p>
-            <div id="userCoins">0</div>
-            <button id="collectBtn">Collect Daily Coins</button>
-            <br>
-            <button id="logoutBtn" style="background: #e74c3c;">Logout</button>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com";
-        import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com";
-
-        // మీ Firebase Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyBhMUIld4qnt42X0BWF_kYZr2R2olDghts",
-            authDomain: "coinloot-f15f3.firebaseapp.com",
-            databaseURL: "https://coinloot-f15f3-default-rtdb.firebaseio.com",
-            projectId: "coinloot-f15f3",
-            storageBucket: "coinloot-f15f3.firebasestorage.app",
-            messagingSenderId: "939943880173",
-            appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
-        const provider = new GoogleAuthProvider();
-
-        const loginSection = document.getElementById('loginSection');
-        const dashboardSection = document.getElementById('dashboardSection');
-
-        // Google Login
-        document.getElementById('loginBtn').onclick = () => {
-            signInWithPopup(auth, provider).catch(error => alert(error.message));
-        };
-
-        // Logout
-        document.getElementById('logoutBtn').onclick = () => signOut(auth);
-
-        // Auth State Change (User లాగిన్ అయ్యాడా లేదా అని చెక్ చేస్తుంది)
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                loginSection.classList.add('hidden');
-                dashboardSection.classList.remove('hidden');
-                document.getElementById('userName').innerText = user.displayName;
-                document.getElementById('userPhoto').src = user.photoURL;
-
-                // యూజర్ డేటాని రీడ్ చేయడం
-                const userRef = ref(db, 'users/' + user.uid);
-                onValue(userRef, (snapshot) => {
-                    const data = snapshot.val();
-                    if (data) {
-                        document.getElementById('userCoins').innerText = data.coins || 0;
-                    } else {
-                        // కొత్త యూజర్ అయితే 0 కాయిన్స్ తో సెట్ చేయడం
-                        set(userRef, { name: user.displayName, email: user.email, coins: 0 });
-                    }
-                });
+            if (nextTime && diff > 0) {
+                btn.disabled = true;
+                let h = Math.floor(diff / 3600000);
+                let m = Math.floor((diff % 3600000) / 60000);
+                let s = Math.floor((diff % 60000) / 1000);
+                msg.innerText = `Next Mining in: ${h}h ${m}m ${s}s`;
             } else {
-                loginSection.classList.remove('hidden');
-                dashboardSection.classList.add('hidden');
+                if(btn.disabled) { document.getElementById('alertSound').play(); }
+                btn.disabled = false;
+                msg.innerText = "Ready to Loot! 💰";
             }
-        });
+        }, 1000);
+    }
+    window.onload = startTimer;
+</script>
 
-        // కాయిన్స్ కలెక్ట్ చేసే బటన్ (టెస్టింగ్ కోసం)
-        document.getElementById('collectBtn').onclick = () => {
-            const user = auth.currentUser;
-            if (user) {
-                const currentCoins = parseInt(document.getElementById('userCoins').innerText);
-                update(ref(db, 'users/' + user.uid), {
-                    coins: currentCoins + 10
-                });
-                alert("10 Coins added!");
-            }
-        };
-    </script>
 </body>
 </html>
