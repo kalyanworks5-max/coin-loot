@@ -1,184 +1,104 @@
-//login page
-
 <!DOCTYPE html>
 <html>
 <head>
-
-<title>Coin Loot Login</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login</title>
 
 <style>
 
-/* =========================
-PAGE BACKGROUND
-========================= */
+/* page background - light blue */
 
 body{
 margin:0;
-font-family:Arial;
-overflow:hidden;
-background:linear-gradient(135deg,#0a3dff,#00aaff);
 height:100vh;
+background:#a8dcff;
 display:flex;
 align-items:center;
 justify-content:center;
-color:white;
+font-family:Arial;
+overflow:hidden;
 }
 
+/* center button */
 
-/* =========================
-LOGIN BOX
-========================= */
-
-.login-box{
-text-align:center;
-background:#00000055;
-padding:40px;
-border-radius:15px;
-backdrop-filter:blur(10px);
+button{
+padding:16px 30px;
+font-size:18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+background:white;
+color:#0b63ff;
+font-weight:bold;
 z-index:2;
 }
 
-
-/* =========================
-LOGIN BUTTON
-========================= */
-
-button{
-background:white;
-color:#0a3dff;
-border:none;
-padding:15px 30px;
-font-size:18px;
-border-radius:10px;
-cursor:pointer;
-font-weight:bold;
-}
-
-
-/* =========================
-MOVING COINS
-========================= */
+/* silver coins */
 
 .coin{
 position:absolute;
-font-size:40px;
-animation:moveCoins 10s linear infinite;
-opacity:0.7;
+font-size:38px;
+color:silver;
+animation:coins 8s linear infinite;
+opacity:0.9;
 }
 
-
-/* coin animation */
-
-@keyframes moveCoins{
+@keyframes coins{
 
 0%{
-transform:translateY(100vh) rotate(0deg);
+transform:translateY(110vh) rotate(0deg);
 }
 
 100%{
-transform:translateY(-100vh) rotate(360deg);
+transform:translateY(-10vh) rotate(360deg);
 }
 
 }
 
 </style>
-
 </head>
 
 <body>
 
-
-<!-- =========================
-MOVING COINS BACKGROUND
-========================= -->
+<!-- silver coin animation -->
 
 <div class="coin" style="left:10%;animation-delay:0s;">🪙</div>
-<div class="coin" style="left:25%;animation-delay:2s;">🪙</div>
-<div class="coin" style="left:40%;animation-delay:4s;">🪙</div>
-<div class="coin" style="left:60%;animation-delay:1s;">🪙</div>
-<div class="coin" style="left:75%;animation-delay:3s;">🪙</div>
-<div class="coin" style="left:90%;animation-delay:5s;">🪙</div>
+<div class="coin" style="left:20%;animation-delay:1s;">🪙</div>
+<div class="coin" style="left:30%;animation-delay:2s;">🪙</div>
+<div class="coin" style="left:40%;animation-delay:3s;">🪙</div>
+<div class="coin" style="left:50%;animation-delay:4s;">🪙</div>
+<div class="coin" style="left:60%;animation-delay:2s;">🪙</div>
+<div class="coin" style="left:70%;animation-delay:5s;">🪙</div>
+<div class="coin" style="left:80%;animation-delay:1s;">🪙</div>
+<div class="coin" style="left:90%;animation-delay:3s;">🪙</div>
 
+<!-- login button -->
 
-
-<!-- =========================
-LOGIN BOX
-========================= -->
-
-<div class="login-box">
-
-<h1>Coin Loot</h1>
-
-<p>Login To Start</p>
-
-<!-- Google Login Button -->
-
-<button onclick="googleLogin()">
-Login With Google
-</button>
-
-</div>
-
-
+<button onclick="googleLogin()">Login With Google</button>
 
 <script type="module">
 
-// =========================
-// FIREBASE IMPORT
-// =========================
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-getAuth,
-GoogleAuthProvider,
-signInWithPopup
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-
-// =========================
-// FIREBASE CONFIG
-// =========================
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
-
-apiKey: "YOUR_API_KEY",
-authDomain: "coinloot-f15f3.firebaseapp.com",
-databaseURL: "https://coinloot-f15f3-default-rtdb.firebaseio.com",
-projectId: "coinloot-f15f3",
-storageBucket: "coinloot-f15f3.firebasestorage.app",
-messagingSenderId: "939943880173",
-appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4"
-
+apiKey:"YOUR_API_KEY",
+authDomain:"coinloot-f15f3.firebaseapp.com",
+projectId:"coinloot-f15f3",
 };
 
-
-// =========================
-// FIREBASE START
-// =========================
-
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
 
+window.googleLogin=function(){
 
-// =========================
-// GOOGLE LOGIN FUNCTION
-// =========================
-
-window.googleLogin = function(){
-
-const provider = new GoogleAuthProvider();
+const provider=new GoogleAuthProvider();
 
 signInWithPopup(auth,provider)
 
-.then((result)=>{
+.then(()=>{
 
-// login success అయితే home page open
-
-window.location = "home.html";
+window.location="home.html";
 
 })
 
@@ -191,7 +111,6 @@ alert(error.message);
 }
 
 </script>
-
 
 </body>
 </html>
