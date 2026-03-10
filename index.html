@@ -6,12 +6,12 @@
 
 <style>
 
-/* Light blue attractive background */
+/* ===== BACKGROUND ===== */
 
 body{
 margin:0;
 height:100vh;
-background:linear-gradient(135deg,#b9e6ff,#7fd3ff,#5ac8ff);
+background:linear-gradient(135deg,#bfe9ff,#7dd3ff,#4bb8ff);
 display:flex;
 align-items:center;
 justify-content:center;
@@ -19,37 +19,76 @@ font-family:Arial;
 overflow:hidden;
 }
 
-/* Login button */
+/* ===== LOGIN BUTTON ===== */
 
-button{
-padding:16px 32px;
-font-size:18px;
-border:none;
-border-radius:10px;
-cursor:pointer;
+.login-btn{
+display:flex;
+align-items:center;
+gap:10px;
 background:white;
-color:#1a73e8;
+color:#4285F4;
+border:none;
+padding:14px 28px;
+font-size:18px;
 font-weight:bold;
-box-shadow:0 5px 20px rgba(0,0,0,0.2);
-z-index:2;
+border-radius:40px;
+cursor:pointer;
+box-shadow:0 8px 25px rgba(0,0,0,0.25);
+transition:all 0.25s ease;
+z-index:5;
 }
 
-/* Silver coin style */
+.login-btn:hover{
+transform:scale(1.07);
+box-shadow:0 12px 35px rgba(0,0,0,0.35);
+}
+
+.login-btn img{
+width:22px;
+}
+
+/* ===== REALISTIC SILVER COIN ===== */
 
 .coin{
 position:absolute;
-width:50px;
-height:50px;
+width:60px;
+height:60px;
 border-radius:50%;
-background:radial-gradient(circle at 30% 30%, #ffffff, #cfcfcf, #9e9e9e);
-box-shadow:inset 0 0 8px rgba(0,0,0,0.3),0 0 8px rgba(255,255,255,0.6);
-animation:floatCoins linear infinite;
-opacity:0.9;
+
+/* metallic silver gradient */
+
+background:
+radial-gradient(circle at 30% 30%, #ffffff 0%, #d9d9d9 30%, #bfbfbf 55%, #9e9e9e 75%, #7d7d7d 100%);
+
+/* shiny edge */
+
+border:3px solid #cfcfcf;
+
+box-shadow:
+inset 0 0 10px rgba(255,255,255,0.8),
+inset 0 0 20px rgba(0,0,0,0.35),
+0 5px 15px rgba(0,0,0,0.35);
+
+animation:float 12s linear infinite;
 }
 
-/* coin floating animation */
+/* coin shine */
 
-@keyframes floatCoins{
+.coin:after{
+content:"";
+position:absolute;
+top:12px;
+left:16px;
+width:12px;
+height:20px;
+background:rgba(255,255,255,0.7);
+border-radius:50%;
+filter:blur(1px);
+}
+
+/* ===== FLOAT ANIMATION ===== */
+
+@keyframes float{
 
 0%{
 transform:translateY(110vh) rotate(0deg);
@@ -66,33 +105,39 @@ transform:translateY(-20vh) rotate(360deg);
 
 <body>
 
-<!-- silver coins animation -->
+<!-- ===== SILVER COINS ===== -->
 
-<div class="coin" style="left:10%;animation-duration:9s;"></div>
-<div class="coin" style="left:20%;animation-duration:7s;"></div>
-<div class="coin" style="left:30%;animation-duration:10s;"></div>
-<div class="coin" style="left:40%;animation-duration:8s;"></div>
-<div class="coin" style="left:50%;animation-duration:11s;"></div>
-<div class="coin" style="left:60%;animation-duration:6s;"></div>
-<div class="coin" style="left:70%;animation-duration:9s;"></div>
-<div class="coin" style="left:80%;animation-duration:7s;"></div>
-<div class="coin" style="left:90%;animation-duration:10s;"></div>
+<div class="coin" style="left:8%;animation-duration:12s;"></div>
+<div class="coin" style="left:18%;animation-duration:10s;"></div>
+<div class="coin" style="left:28%;animation-duration:14s;"></div>
+<div class="coin" style="left:38%;animation-duration:9s;"></div>
+<div class="coin" style="left:48%;animation-duration:13s;"></div>
+<div class="coin" style="left:58%;animation-duration:11s;"></div>
+<div class="coin" style="left:68%;animation-duration:15s;"></div>
+<div class="coin" style="left:78%;animation-duration:10s;"></div>
+<div class="coin" style="left:88%;animation-duration:13s;"></div>
 
-<button onclick="googleLogin()">Login With Google</button>
+<!-- ===== LOGIN BUTTON ===== -->
+
+<button class="login-btn" onclick="googleLogin()">
+<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
+Login With Google
+</button>
+
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-const firebaseConfig = {
+const firebaseConfig={
 apiKey:"YOUR_API_KEY",
 authDomain:"coinloot-f15f3.firebaseapp.com",
-projectId:"coinloot-f15f3",
+projectId:"coinloot-f15f3"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
 
 window.googleLogin=function(){
 
@@ -100,14 +145,10 @@ const provider=new GoogleAuthProvider();
 
 signInWithPopup(auth,provider)
 .then(()=>{
-
 window.location="home.html";
-
 })
 .catch((error)=>{
-
 alert(error.message);
-
 });
 
 }
