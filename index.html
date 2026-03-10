@@ -6,16 +6,20 @@
 
 <style>
 
-/* PAGE STYLE */
+/* ===============================
+🎨 PAGE DESIGN
+================================ */
 body{
-font-family: Arial;
+font-family:Arial;
 background:#111;
 color:white;
 text-align:center;
 padding:30px;
 }
 
-/* LOGIN BUTTON */
+/* ===============================
+🔘 BUTTON STYLE
+================================ */
 button{
 background:#ff9800;
 border:none;
@@ -27,10 +31,15 @@ cursor:pointer;
 margin:10px;
 }
 
-/* COINS BOX */
+/* ===============================
+🪙 COINS BOX
+================================ */
 #coinsBox{
 font-size:25px;
 margin-top:20px;
+background:#222;
+padding:20px;
+border-radius:10px;
 }
 
 </style>
@@ -38,47 +47,82 @@ margin-top:20px;
 
 <body>
 
+<!-- ===============================
+🪙 WEBSITE TITLE
+================================ -->
 <h1>Coin Loot</h1>
 
-<!-- LOGIN BUTTON -->
+<!-- ===============================
+🔐 GOOGLE LOGIN BUTTON
+================================ -->
 <button onclick="googleLogin()">Login With Google</button>
 
-<!-- USER INFO -->
+<!-- ===============================
+👤 USER NAME SHOW
+================================ -->
 <h3 id="username"></h3>
 
-<!-- COINS -->
+<!-- ===============================
+🪙 COINS DISPLAY
+================================ -->
 <div id="coinsBox">
 Coins: <span id="coins">0</span>
 </div>
 
-<!-- WATCH AD -->
+<!-- ===============================
+📺 WATCH AD BUTTON
+================================ -->
 <button onclick="watchAd()">Watch Ad +100 Coins</button>
+
+<!-- ===============================
+🎁 DAILY REWARD BUTTON
+================================ -->
+<button onclick="dailyReward()">Daily Reward +500</button>
+
 
 <script type="module">
 
-/* FIREBASE IMPORT */
+/* ===============================
+🔥 FIREBASE IMPORT
+================================ */
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { 
+getAuth,
+GoogleAuthProvider,
+signInWithPopup
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { 
+getDatabase,
+ref,
+set,
+get,
+update
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 
-/* FIREBASE CONFIG */
+/* ===============================
+⚙️ FIREBASE CONFIG
+================================ */
 
 const firebaseConfig = {
+
 apiKey: "AIzaSyBhMUIld4qnt42X0BWF_kYZr2R2olDghts",
 authDomain: "coinloot-f15f3.firebaseapp.com",
 databaseURL: "https://coinloot-f15f3-default-rtdb.firebaseio.com",
 projectId: "coinloot-f15f3",
 storageBucket: "coinloot-f15f3.firebasestorage.app",
 messagingSenderId: "939943880173",
-appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4",
-measurementId: "G-XMZG9Q2128"
+appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4"
+
 };
 
 
-/* INITIALIZE FIREBASE */
+/* ===============================
+🚀 FIREBASE START
+================================ */
 
 const app = initializeApp(firebaseConfig);
 
@@ -86,8 +130,12 @@ const auth = getAuth(app);
 
 const db = getDatabase(app);
 
+let currentUser = null;
 
-/* GOOGLE LOGIN */
+
+/* ===============================
+🔐 GOOGLE LOGIN
+================================ */
 
 window.googleLogin = function(){
 
@@ -99,7 +147,10 @@ signInWithPopup(auth,provider)
 
 const user = result.user;
 
-document.getElementById("username").innerText = user.displayName;
+currentUser = user;
+
+document.getElementById("username").innerText =
+"Welcome " + user.displayName;
 
 const userRef = ref(db,"users/"+user.uid);
 
@@ -110,18 +161,20 @@ if(!snap.exists()){
 set(userRef,{
 name:user.displayName,
 email:user.email,
-coins:0
+coins:0,
+lastReward:0
 });
 
 document.getElementById("coins").innerText = 0;
 
-}else{
-
-document.getElementById("coins").innerText = snap.val().coins;
-
 }
 
-window.currentUser = user;
+else{
+
+document.getElementById("coins").innerText =
+snap.val().coins;
+
+}
 
 })
 
@@ -134,11 +187,13 @@ alert(error.message);
 }
 
 
-/* WATCH AD FUNCTION */
+/* ===============================
+📺 WATCH AD + MONETAG
+================================ */
 
 window.watchAd = async function(){
 
-if(!window.currentUser){
+if(!currentUser){
 
 alert("Login First");
 
@@ -146,21 +201,73 @@ return;
 
 }
 
-let coins = parseInt(document.getElementById("coins").innerText);
+/* Monetag Ad Open */
+
+window.open("https://omg10.com/4/10701853","_blank");
+
+
+let coins =
+parseInt(document.getElementById("coins").innerText);
 
 coins += 100;
 
 document.getElementById("coins").innerText = coins;
 
-const userRef = ref(db,"users/"+window.currentUser.uid);
+const userRef = ref(db,"users/"+currentUser.uid);
 
-set(userRef,{
-name:window.currentUser.displayName,
-email:window.currentUser.email,
+update(userRef,{
 coins:coins
 });
 
-alert("100 Coins Added");
+alert("Ad Watched +100 Coins Added");
+
+}
+
+
+/* ===============================
+🎁 DAILY REWARD
+================================ */
+
+window.dailyReward = async function(){
+
+if(!currentUser){
+
+alert("Login First");
+
+return;
+
+}
+
+const userRef = ref(db,"users/"+currentUser.uid);
+
+const snap = await get(userRef);
+
+let data = snap.val();
+
+let lastReward = data.lastReward || 0;
+
+let now = Date.now();
+
+let hours = (now - lastReward) / 1000 / 60 / 60;
+
+if(hours < 24){
+
+alert("Daily reward already claimed");
+
+return;
+
+}
+
+let coins = data.coins + 500;
+
+document.getElementById("coins").innerText = coins;
+
+update(userRef,{
+coins:coins,
+lastReward:now
+});
+
+alert("500 Daily Reward Added");
 
 }
 
