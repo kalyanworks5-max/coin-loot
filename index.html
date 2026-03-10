@@ -3,66 +3,148 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <title>Coin Loot Login</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 
+/* =========================
+PAGE BACKGROUND
+========================= */
+
 body{
+margin:0;
 font-family:Arial;
-background:linear-gradient(135deg,#ff9800,#ff5722);
+overflow:hidden;
+background:linear-gradient(135deg,#0a3dff,#00aaff);
 height:100vh;
 display:flex;
 align-items:center;
 justify-content:center;
 color:white;
-text-align:center;
 }
 
-.box{
-background:#00000090;
+
+/* =========================
+LOGIN BOX
+========================= */
+
+.login-box{
+text-align:center;
+background:#00000055;
 padding:40px;
 border-radius:15px;
+backdrop-filter:blur(10px);
+z-index:2;
 }
 
+
+/* =========================
+LOGIN BUTTON
+========================= */
+
 button{
-background:#ffffff;
-color:black;
+background:white;
+color:#0a3dff;
 border:none;
-padding:15px 25px;
+padding:15px 30px;
 font-size:18px;
 border-radius:10px;
 cursor:pointer;
+font-weight:bold;
+}
+
+
+/* =========================
+MOVING COINS
+========================= */
+
+.coin{
+position:absolute;
+font-size:40px;
+animation:moveCoins 10s linear infinite;
+opacity:0.7;
+}
+
+
+/* coin animation */
+
+@keyframes moveCoins{
+
+0%{
+transform:translateY(100vh) rotate(0deg);
+}
+
+100%{
+transform:translateY(-100vh) rotate(360deg);
+}
+
 }
 
 </style>
+
 </head>
 
 <body>
 
-<div class="box">
+
+<!-- =========================
+MOVING COINS BACKGROUND
+========================= -->
+
+<div class="coin" style="left:10%;animation-delay:0s;">🪙</div>
+<div class="coin" style="left:25%;animation-delay:2s;">🪙</div>
+<div class="coin" style="left:40%;animation-delay:4s;">🪙</div>
+<div class="coin" style="left:60%;animation-delay:1s;">🪙</div>
+<div class="coin" style="left:75%;animation-delay:3s;">🪙</div>
+<div class="coin" style="left:90%;animation-delay:5s;">🪙</div>
+
+
+
+<!-- =========================
+LOGIN BOX
+========================= -->
+
+<div class="login-box">
 
 <h1>Coin Loot</h1>
-<p>Login to Start Earning Coins</p>
 
-<button onclick="googleLogin()">Login With Google</button>
+<p>Login To Start</p>
+
+<!-- Google Login Button -->
+
+<button onclick="googleLogin()">
+Login With Google
+</button>
 
 </div>
 
 
+
 <script type="module">
+
+// =========================
+// FIREBASE IMPORT
+// =========================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-import { 
+import {
 getAuth,
 GoogleAuthProvider,
 signInWithPopup
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+
+// =========================
+// FIREBASE CONFIG
+// =========================
+
 const firebaseConfig = {
 
-apiKey: "AIzaSyBhMUIld4qnt42X0BWF_kYZr2R2olDghts",
+apiKey: "YOUR_API_KEY",
 authDomain: "coinloot-f15f3.firebaseapp.com",
 databaseURL: "https://coinloot-f15f3-default-rtdb.firebaseio.com",
 projectId: "coinloot-f15f3",
@@ -72,9 +154,19 @@ appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4"
 
 };
 
+
+// =========================
+// FIREBASE START
+// =========================
+
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
+
+
+// =========================
+// GOOGLE LOGIN FUNCTION
+// =========================
 
 window.googleLogin = function(){
 
@@ -84,7 +176,7 @@ signInWithPopup(auth,provider)
 
 .then((result)=>{
 
-/* Login success → Home page */
+// login success అయితే home page open
 
 window.location = "home.html";
 
@@ -100,146 +192,6 @@ alert(error.message);
 
 </script>
 
-</body>
-</html>
-
-// home page
-
-<!DOCTYPE html>
-<html>
-<head>
-<title>Coin Loot Home</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-
-body{
-font-family:Arial;
-background:#111;
-color:white;
-text-align:center;
-padding:40px;
-}
-
-button{
-background:#ff9800;
-border:none;
-padding:15px;
-font-size:18px;
-border-radius:10px;
-color:white;
-cursor:pointer;
-margin:10px;
-}
-
-#coins{
-font-size:30px;
-}
-
-</style>
-</head>
-
-<body>
-
-<h1>Coin Loot Dashboard</h1>
-
-<h2>Coins: <span id="coins">0</span></h2>
-
-<button onclick="watchAd()">Watch Ad +100 Coins</button>
-
-<button onclick="dailyReward()">Daily Reward +500</button>
-
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import { 
-getAuth,
-onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-import { 
-getDatabase,
-ref,
-get,
-update
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-const firebaseConfig = {
-
-apiKey: "AIzaSyBhMUIld4qnt42X0BWF_kYZr2R2olDghts",
-authDomain: "coinloot-f15f3.firebaseapp.com",
-databaseURL: "https://coinloot-f15f3-default-rtdb.firebaseio.com",
-projectId: "coinloot-f15f3",
-storageBucket: "coinloot-f15f3.firebasestorage.app",
-messagingSenderId: "939943880173",
-appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4"
-
-};
-
-const app = initializeApp(firebaseConfig);
-
-const auth = getAuth(app);
-
-const db = getDatabase(app);
-
-let currentUser;
-
-onAuthStateChanged(auth, async(user)=>{
-
-if(user){
-
-currentUser = user;
-
-const userRef = ref(db,"users/"+user.uid);
-
-const snap = await get(userRef);
-
-if(snap.exists()){
-
-document.getElementById("coins").innerText =
-snap.val().coins;
-
-}
-
-}
-
-});
-
-
-window.watchAd = async function(){
-
-window.open("https://omg10.com/4/10701853","_blank");
-
-let coins = parseInt(document.getElementById("coins").innerText);
-
-coins += 100;
-
-document.getElementById("coins").innerText = coins;
-
-const userRef = ref(db,"users/"+currentUser.uid);
-
-update(userRef,{coins:coins});
-
-}
-
-
-window.dailyReward = async function(){
-
-let coins = parseInt(document.getElementById("coins").innerText);
-
-coins += 500;
-
-document.getElementById("coins").innerText = coins;
-
-const userRef = ref(db,"users/"+currentUser.uid);
-
-update(userRef,{coins:coins});
-
-}
-
-</script>
 
 </body>
 </html>
