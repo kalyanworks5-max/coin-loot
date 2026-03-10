@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coin Loot Login</title>
+
+<style>
+
+body{
+margin:0;
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+font-family:Arial;
+background:linear-gradient(135deg,#0f0f0f,#1f1f1f,#2e2e2e);
+}
+
+/* silver coins */
+
+.coin{
+position:absolute;
+width:130px;
+height:130px;
+border-radius:50%;
+
+background:radial-gradient(circle at 30% 30%, #ffffff 0%, #dcdcdc 30%, #bfbfbf 55%, #9a9a9a 75%, #6e6e6e 100%);
+
+border:4px solid #cfcfcf;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+font-size:50px;
+font-weight:bold;
+color:#333;
+
+animation:coinFloat 6s ease-in-out infinite;
+}
+
+.coin1{top:10%;left:12%;}
+.coin2{top:18%;right:14%;}
+.coin3{bottom:18%;left:18%;}
+.coin4{bottom:12%;right:18%;}
+
+@keyframes coinFloat{
+0%{transform:translateY(0)}
+50%{transform:translateY(-10px)}
+100%{transform:translateY(0)}
+}
+
+/* login button */
+
+.login-btn{
+
+position:relative;
+
+padding:16px 35px;
+
+border:none;
+
+border-radius:40px;
+
+font-size:18px;
+
+cursor:pointer;
+
+display:flex;
+
+align-items:center;
+
+gap:10px;
+
+background:white;
+
+box-shadow:0 8px 20px rgba(0,0,0,0.6);
+
+}
+
+.login-btn img{
+width:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="coin coin1">₡</div>
+<div class="coin coin2">₡</div>
+<div class="coin coin3">₡</div>
+<div class="coin coin4">₡</div>
+
+<button class="login-btn" onclick="googleLogin()">
+<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
+Login With Google
+</button>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyBhMUIld4qnt42X0BWF_kYZr2R2olDghts",
+authDomain: "coinloot-f15f3.firebaseapp.com",
+projectId: "coinloot-f15f3",
+storageBucket: "coinloot-f15f3.appspot.com",
+messagingSenderId: "939943880173",
+appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+window.googleLogin = function(){
+
+const provider = new GoogleAuthProvider();
+
+signInWithPopup(auth, provider)
+
+.then(()=>{
+window.location="home.html";
+})
+
+.catch((error)=>{
+alert(error.message);
+});
+
+}
+
+</script>
+
+</body>
+</html>
