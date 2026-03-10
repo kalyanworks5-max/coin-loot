@@ -1,116 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Login</title>
-
-<style>
-
-/* page background - light blue */
-
-body{
-margin:0;
-height:100vh;
-background:#a8dcff;
-display:flex;
-align-items:center;
-justify-content:center;
-font-family:Arial;
-overflow:hidden;
-}
-
-/* center button */
-
-button{
-padding:16px 30px;
-font-size:18px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-background:white;
-color:#0b63ff;
-font-weight:bold;
-z-index:2;
-}
-
-/* silver coins */
-
-.coin{
-position:absolute;
-font-size:38px;
-color:silver;
-animation:coins 8s linear infinite;
-opacity:0.9;
-}
-
-@keyframes coins{
-
-0%{
-transform:translateY(110vh) rotate(0deg);
-}
-
-100%{
-transform:translateY(-10vh) rotate(360deg);
-}
-
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinLoot - Earn & Track</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #f4f7f6; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        button { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px; }
+        .hidden { display: none; }
+        #userCoins { font-size: 24px; color: #2ecc71; font-weight: bold; }
+    </style>
 </head>
-
 <body>
 
-<!-- silver coin animation -->
+    <div class="card">
+        <h1>CoinLoot 💰</h1>
+        
+        <!-- Login Section -->
+        <div id="loginSection">
+            <p>వెల్కమ్! మీ పాయింట్స్ చూసుకోవడానికి లాగిన్ అవ్వండి.</p>
+            <button id="loginBtn">Login with Google</button>
+        </div>
 
-<div class="coin" style="left:10%;animation-delay:0s;">🪙</div>
-<div class="coin" style="left:20%;animation-delay:1s;">🪙</div>
-<div class="coin" style="left:30%;animation-delay:2s;">🪙</div>
-<div class="coin" style="left:40%;animation-delay:3s;">🪙</div>
-<div class="coin" style="left:50%;animation-delay:4s;">🪙</div>
-<div class="coin" style="left:60%;animation-delay:2s;">🪙</div>
-<div class="coin" style="left:70%;animation-delay:5s;">🪙</div>
-<div class="coin" style="left:80%;animation-delay:1s;">🪙</div>
-<div class="coin" style="left:90%;animation-delay:3s;">🪙</div>
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="hidden">
+            <img id="userPhoto" src="" width="60" style="border-radius: 50%;">
+            <h3 id="userName">Loading...</h3>
+            <p>మీ ప్రస్తుత కాయిన్స్:</p>
+            <div id="userCoins">0</div>
+            <button id="collectBtn">Collect Daily Coins</button>
+            <br>
+            <button id="logoutBtn" style="background: #e74c3c;">Logout</button>
+        </div>
+    </div>
 
-<!-- login button -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com";
+        import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com";
 
-<button onclick="googleLogin()">Login With Google</button>
+        // మీ Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhMUIld4qnt42X0BWF_kYZr2R2olDghts",
+            authDomain: "coinloot-f15f3.firebaseapp.com",
+            databaseURL: "https://coinloot-f15f3-default-rtdb.firebaseio.com",
+            projectId: "coinloot-f15f3",
+            storageBucket: "coinloot-f15f3.firebasestorage.app",
+            messagingSenderId: "939943880173",
+            appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4"
+        };
 
-<script type="module">
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+        const provider = new GoogleAuthProvider();
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        const loginSection = document.getElementById('loginSection');
+        const dashboardSection = document.getElementById('dashboardSection');
 
-const firebaseConfig = {
-apiKey:"YOUR_API_KEY",
-authDomain:"coinloot-f15f3.firebaseapp.com",
-projectId:"coinloot-f15f3",
-};
+        // Google Login
+        document.getElementById('loginBtn').onclick = () => {
+            signInWithPopup(auth, provider).catch(error => alert(error.message));
+        };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+        // Logout
+        document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
-window.googleLogin=function(){
+        // Auth State Change (User లాగిన్ అయ్యాడా లేదా అని చెక్ చేస్తుంది)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loginSection.classList.add('hidden');
+                dashboardSection.classList.remove('hidden');
+                document.getElementById('userName').innerText = user.displayName;
+                document.getElementById('userPhoto').src = user.photoURL;
 
-const provider=new GoogleAuthProvider();
+                // యూజర్ డేటాని రీడ్ చేయడం
+                const userRef = ref(db, 'users/' + user.uid);
+                onValue(userRef, (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        document.getElementById('userCoins').innerText = data.coins || 0;
+                    } else {
+                        // కొత్త యూజర్ అయితే 0 కాయిన్స్ తో సెట్ చేయడం
+                        set(userRef, { name: user.displayName, email: user.email, coins: 0 });
+                    }
+                });
+            } else {
+                loginSection.classList.remove('hidden');
+                dashboardSection.classList.add('hidden');
+            }
+        });
 
-signInWithPopup(auth,provider)
-
-.then(()=>{
-
-window.location="home.html";
-
-})
-
-.catch((error)=>{
-
-alert(error.message);
-
-});
-
-}
-
-</script>
-
+        // కాయిన్స్ కలెక్ట్ చేసే బటన్ (టెస్టింగ్ కోసం)
+        document.getElementById('collectBtn').onclick = () => {
+            const user = auth.currentUser;
+            if (user) {
+                const currentCoins = parseInt(document.getElementById('userCoins').innerText);
+                update(ref(db, 'users/' + user.uid), {
+                    coins: currentCoins + 10
+                });
+                alert("10 Coins added!");
+            }
+        };
+    </script>
 </body>
 </html>
