@@ -1,176 +1,222 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Coin Loot Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Coin Loot Mining</title>
+    <style>
+        /* Modern Dark Theme with Animated Background */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
+            color: white;
+            overflow: hidden;
+            height: 100-vh;
+        }
 
-<style>
+        /* Top Bar Styling */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-body{
-margin:0;
-font-family:Arial;
-background:linear-gradient(135deg,#0f0f0f,#1f1f1f,#2e2e2e);
-color:white;
-}
+        .menu {
+            font-size: 24px;
+            cursor: pointer;
+            color: #00d2ff;
+        }
 
-.topbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:15px 20px;
-}
+        .wallet {
+            background: linear-gradient(135deg, #f39c12, #f1c40f);
+            color: #000;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-.menu{
-font-size:28px;
-cursor:pointer;
-}
+        /* Mining Section */
+        .centerBox {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
 
-.wallet{
-background:linear-gradient(135deg,#cfcfcf,#8f8f8f);
-color:black;
-padding:8px 16px;
-border-radius:25px;
-font-weight:bold;
-}
+        /* Glowing Mining Button */
+        .mining-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.dropdown{
-position:absolute;
-top:60px;
-left:20px;
-background:#1a1a1a;
-border-radius:10px;
-padding:10px;
-display:none;
-}
+        .collectBtn {
+            width: 180px;
+            height: 180px;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 2;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.5);
+            transition: transform 0.1s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
 
-.dropdown div{
-padding:8px 15px;
-cursor:pointer;
-}
+        .collectBtn:active {
+            transform: scale(0.92);
+        }
 
-.dropdown div:hover{
-background:#333;
-}
+        /* Pulse Animation */
+        .pulse {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            background: rgba(0, 210, 255, 0.3);
+            border-radius: 50%;
+            z-index: 1;
+            animation: pulse-ring 2s infinite;
+        }
 
-.centerBox{
-height:80vh;
-display:flex;
-align-items:center;
-justify-content:center;
-}
+        @keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
 
-.collectBtn{
-background:linear-gradient(135deg,#dcdcdc,#8a8a8a);
-color:black;
-border:none;
-padding:20px 40px;
-font-size:20px;
-border-radius:40px;
-cursor:pointer;
-font-weight:bold;
-}
+        .status-text {
+            margin-top: 25px;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: #00d2ff;
+            text-transform: uppercase;
+            animation: blink 1.5s infinite;
+        }
 
-</style>
+        @keyframes blink {
+            50% { opacity: 0.4; }
+        }
+
+        /* Dropdown Style */
+        .dropdown {
+            position: absolute;
+            top: 75px;
+            left: 20px;
+            background: #16213e;
+            border-radius: 12px;
+            padding: 10px;
+            display: none;
+            z-index: 100;
+            min-width: 150px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .dropdown div {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .dropdown div:hover {
+            background: #0f3460;
+            color: #00d2ff;
+        }
+    </style>
 </head>
-
 <body>
 
 <div class="topbar">
-
-<div class="menu" onclick="toggleMenu()">☰</div>
-
-<div class="wallet">
-🪙 <span id="coins">0</span>
-</div>
-
+    <div class="menu" onclick="toggleMenu()">☰</div>
+    <div class="wallet">
+        <span>🪙</span>
+        <span id="coins">0</span>
+    </div>
 </div>
 
 <div class="dropdown" id="menuBox">
-<div>Profile</div>
-<div>Rewards</div>
-<div>Logout</div>
+    <div>Profile</div>
+    <div>Rewards</div>
+    <div style="color: #ff4d4d;">Logout</div>
 </div>
 
 <div class="centerBox">
-
-<button class="collectBtn" onclick="collectCoins()">
-Collect Your Coins (20)
-</button>
-
+    <div class="mining-container">
+        <div class="pulse"></div>
+        <button class="collectBtn" onclick="collectCoins()">
+            <span style="font-size: 35px; margin-bottom: 5px;">⛏️</span>
+            MINE <br>+20
+        </button>
+    </div>
+    <div class="status-text">Mining System Active</div>
 </div>
 
 <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    // Same Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyBhMUIld4qnt42X0BWF_kYZr2R2olDghts",
+        authDomain: "coinloot-f15f3.firebaseapp.com",
+        databaseURL: "https://coinloot-f15f3-default-rtdb.firebaseio.com",
+        projectId: "coinloot-f15f3",
+        storageBucket: "coinloot-f15f3.appspot.com",
+        messagingSenderId: "939943880173",
+        appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4"
+    };
 
-const firebaseConfig = {
-apiKey: "AIzaSyBhMUIld4qnt42X0BWF_kYZr2R2olDghts",
-authDomain: "coinloot-f15f3.firebaseapp.com",
-databaseURL: "https://coinloot-f15f3-default-rtdb.firebaseio.com",
-projectId: "coinloot-f15f3",
-storageBucket: "coinloot-f15f3.appspot.com",
-messagingSenderId: "939943880173",
-appId: "1:939943880173:web:0f1d9cf71c7dfb17deb3e4"
-};
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    let currentUser;
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
+    onAuthStateChanged(auth, async(user)=>{
+        if(user){
+            currentUser=user;
+            const userRef=ref(db,"users/"+user.uid);
+            const snap=await get(userRef);
+            if(!snap.exists()){
+                set(userRef,{coins:0});
+                document.getElementById("coins").innerText=0;
+            } else{
+                document.getElementById("coins").innerText=snap.val().coins;
+            }
+        }
+    });
 
-let currentUser;
+    window.collectCoins = async function(){
+        if(!currentUser) return;
+        let coinsElement = document.getElementById("coins");
+        let coins = parseInt(coinsElement.innerText);
+        coins += 20;
+        coinsElement.innerText = coins;
+        
+        const userRef = ref(db, "users/" + currentUser.uid);
+        update(userRef, {coins: coins});
+    }
 
-onAuthStateChanged(auth, async(user)=>{
-
-if(user){
-
-currentUser=user;
-
-const userRef=ref(db,"users/"+user.uid);
-
-const snap=await get(userRef);
-
-if(!snap.exists()){
-
-set(userRef,{coins:0});
-
-document.getElementById("coins").innerText=0;
-
-}
-
-else{
-
-document.getElementById("coins").innerText=snap.val().coins;
-
-}
-
-}
-
-});
-
-window.collectCoins = async function(){
-
-let coins=parseInt(document.getElementById("coins").innerText);
-
-coins+=20;
-
-document.getElementById("coins").innerText=coins;
-
-const userRef=ref(db,"users/"+currentUser.uid);
-
-update(userRef,{coins:coins});
-
-}
-
-window.toggleMenu=function(){
-
-let menu=document.getElementById("menuBox");
-
-menu.style.display = menu.style.display=="block" ? "none" : "block";
-
-}
-
+    window.toggleMenu = function(){
+        let menu = document.getElementById("menuBox");
+        menu.style.display = menu.style.display == "block" ? "none" : "block";
+    }
 </script>
 
 </body>
